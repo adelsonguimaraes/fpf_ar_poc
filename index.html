@@ -8,7 +8,12 @@
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.0.8/aframe/build/aframe-ar.js"></script>
 </head>
 <body>
-    <a-scene embedded arjs vr-mode-ui="enabled: false">
+    <a-scene arjs
+    embedded
+    renderer="logarithmicDepthBuffer: true;"
+    vr-mode-ui="enabled: false"
+    gesture-detector
+    id="scene">
         <a-marker preset="hiro">
             <!-- Carregue o modelo Blender usando o atributo gltf-model -->
             <a-entity gltf-model="url(FPFmdel.glb)" 

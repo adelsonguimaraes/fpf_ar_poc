@@ -5,61 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebXR com Three.js</title>
     <script src="https://cdn.jsdelivr.net/npm/three@0.133.1/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.133.1/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://unpkg.com/@google/model-viewer/dist/model-viewer.js"></script>
 </head>
 <body>
-    <script>
-        // Configuração da cena Three.js
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // Carregar modelo glb
-        const loader = new THREE.GLTFLoader();
-        loader.load(
-            // URL do modelo glb
-            'FPFmdel.glb',
-            // Função de callback chamada quando o modelo é carregado
-            function (gltf) {
-                const model = gltf.scene;
-                scene.add(model);
-
-                // Iniciar WebXR quando o modelo for carregado
-                navigator.xr.requestDevice().then((device) => {
-                    device.requestSession({ mode: 'immersive-ar' }).then((session) => {
-                        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, renderer) });
-                        session.requestAnimationFrame(renderFrame);
-
-                        // Função de renderização do quadro
-                        function renderFrame(time, frame) {
-                            const pose = frame.getViewerPose(frame.session.referenceSpace);
-                            if (pose) {
-                                const viewerMatrix = new THREE.Matrix4().fromArray(pose.transform.matrix);
-                                camera.matrixAutoUpdate = false;
-                                camera.matrix = viewerMatrix;
-
-                                renderer.render(scene, camera);
-                                session.requestAnimationFrame(renderFrame);
-                            }
-                        }
-                    });
-                });
-            },
-            // Função de progresso (opcional)
-            function (xhr) {
-                console.log((xhr.loaded / xhr.total * 100) + '% carregado');
-            },
-            // Função de callback para lidar com erros (opcional)
-            function (error) {
-                console.error('Erro ao carregar o modelo:', error);
-            }
-        );
-
-        // Configuração da câmera
-        camera.position.set(0, 0, 0);
-
-    </script>
+    <model-viewer
+        src="FPFmdel.glb"
+        ar
+        auto-rotate
+        camera-controls
+        style="width: 100%; height: 100vh;"
+    ></model-viewer>
 </body>
 </html>

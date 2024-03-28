@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebXR com Three.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.133.1/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.133.1/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body>
+    <script>
+        // Configuração da cena Three.js
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Carregar modelo glTF
+        const loader = new THREE.GLTFLoader();
+        loader.load(
+            // URL do modelo glTF
+            'FPFmdel.glb',
+            // Função de callback chamada quando o modelo é carregado
+            function (gltf) {
+                scene.add(gltf.scene);
+            },
+            // Função de progresso (opcional)
+            function (xhr) {
+                console.log((xhr.loaded / xhr.total * 100) + '% carregado');
+            },
+            // Função de callback para lidar com erros (opcional)
+            function (error) {
+                console.error('Erro ao carregar o modelo:', error);
+            }
+        );
+
+        // Configuração da câmera
+        camera.position.set(0, 1.6, 3);
+
+        // Função para atualizar a cena
+        function animate() {
+            renderer.setAnimationLoop(render);
+        }
+
+        function render() {
+            renderer.render(scene, camera);
+        }
+
+        // Iniciar a animação
+        animate();
+    </script>
+</body>
+</html>

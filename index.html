@@ -8,21 +8,22 @@
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.0.8/aframe/build/aframe-ar.js"></script>
 </head>
 <body>
+    <!-- renderer="logarithmicDepthBuffer: true;" -->
     <a-scene arjs
     embedded
-    renderer="logarithmicDepthBuffer: true;"
     vr-mode-ui="enabled: false"
     gesture-detector
     id="scene">
     <!-- animation__spin="property: rotation; to: 0 360 0; loop: true; dur: 10000" -->
         <a-marker preset="hiro">
             <!-- Carregue o modelo Blender usando o atributo gltf-model -->
-            <a-entity id="model" gltf-model="url(FPFmdel.glb)" 
+            <a-entity id="model" 
+            gltf-model="url(FPFmdel.glb)" 
             scale="0.5 0.5 0.5"
             rotation="0 0 0"
             sensor-orientation>
       <!-- Adicione um objeto de colisão para capturar cliques -->
-      <a-box position="0 0 0" depth="0.2" height="0.2" width="0.2" material="opacity: 0;"></a-box>
+      <!-- <a-box position="0 0 0" depth="0.2" height="0.2" width="0.2" material="opacity: 0;"></a-box> -->
         </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
@@ -63,9 +64,9 @@
         document.addEventListener('touchend', function(event) {
             isTouching = false;
         });
-    </script>
 
-    <script>
+
+        // Evento que pega gesto de rotação
         AFRAME.registerComponent('sensor-orientation', {
             init: function () {
                 window.addEventListener('deviceorientation', this.rotateModel.bind(this), false);
@@ -79,6 +80,8 @@
                 var car = document.getElementById('model');
                 car.object3D.rotation.y = -gamma * Math.PI / 180; // Rotação em relação ao eixo y
                 car.object3D.rotation.x = beta * Math.PI / 180; // Rotação em relação ao eixo x
+
+                alert(`${gamma} -- ${beta}`);
             }
         });
     </script>

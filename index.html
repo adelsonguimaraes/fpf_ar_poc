@@ -69,6 +69,7 @@
         // Evento que pega gesto de rotação
         AFRAME.registerComponent('sensor-orientation', {
             init: function () {
+                print('iniciando o evento de rotação')
                 window.addEventListener('deviceorientation', this.rotateModel.bind(this), false);
             },
             rotateModel: function (event) {

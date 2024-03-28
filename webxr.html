@@ -33,23 +33,8 @@
             directionalLight.position.set(10, 15, 10);
             scene.add(directionalLight);
 
-            // Set up the WebGLRenderer, which handles rendering to the session's base layer.
-            const renderer = new THREE.WebGLRenderer({
-                alpha: true,
-                preserveDrawingBuffer: true,
-                canvas: canvas,
-                context: gl
-            });
-            renderer.autoClear = false;
-
-            // The API directly updates the camera matrices.
-            // Disable matrix auto updates so three.js doesn't attempt
-            // to handle the matrices independently.
-            const camera = new THREE.PerspectiveCamera();
-            camera.matrixAutoUpdate = false;
-
             // Initialize a WebXR session using "immersive-ar".
-            const session = await navigator.xr.requestSession("immersive-ar", {requiredFeatures: ['hit-test']});
+            const session = await navigator.xr.requestSession("immersive-ar", { requiredFeatures: ['hit-test'] });
             session.updateRenderState({
                 baseLayer: new XRWebGLLayer(session, gl)
             });
@@ -87,6 +72,21 @@
             }
             session.requestAnimationFrame(onXRFrame);
         }
+
+        // Set up the WebGLRenderer, which handles rendering to the session's base layer.
+        const renderer = new THREE.WebGLRenderer({
+            alpha: true,
+            preserveDrawingBuffer: true,
+            canvas: canvas,
+            context: gl
+        });
+        renderer.autoClear = false;
+
+        // The API directly updates the camera matrices.
+        // Disable matrix auto updates so three.js doesn't attempt
+        // to handle the matrices independently.
+        const camera = new THREE.PerspectiveCamera();
+        camera.matrixAutoUpdate = false;
 
 
     </script>

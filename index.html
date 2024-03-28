@@ -17,7 +17,7 @@
     <!-- animation__spin="property: rotation; to: 0 360 0; loop: true; dur: 10000" -->
         <a-marker preset="hiro">
             <!-- Carregue o modelo Blender usando o atributo gltf-model -->
-            <a-entity gltf-model="url(FPFmdel.glb)" 
+            <a-entity id="model" gltf-model="url(FPFmdel.glb)" 
             scale="0.5 0.5 0.5"
             rotation="0 0 0"
             sensor-orientation>
@@ -76,7 +76,7 @@
                 var gamma = event.gamma; // Inclinação para esquerda/direita
 
                 // Rotação automática do modelo com base nos ângulos de inclinação
-                var car = document.getElementById('car');
+                var car = document.getElementById('model');
                 car.object3D.rotation.y = -gamma * Math.PI / 180; // Rotação em relação ao eixo y
                 car.object3D.rotation.x = beta * Math.PI / 180; // Rotação em relação ao eixo x
             }

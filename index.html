@@ -21,7 +21,7 @@
             gltf-model="url(FPFmdel.glb)" 
             scale="0.5 0.5 0.5"
             rotation="0 0 0"
-            sensor-orientation>
+            gyro-rotation>
       <!-- Adicione um objeto de colisão para capturar cliques -->
       <!-- <a-box position="0 0 0" depth="0.2" height="0.2" width="0.2" material="opacity: 0;"></a-box> -->
         </a-marker>
@@ -67,13 +67,13 @@
 
 
         // Evento que pega gesto de rotação
-        AFRAME.registerComponent('sensor-orientation', {
+        AFRAME.registerComponent('gyro-rotation', {
             init: function () {
-                print('iniciando o evento de rotação')
-                window.addEventListener('deviceorientation', this.rotateModel.bind(this), false);
+                window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
             },
-            rotateModel: function (event) {
+            handleOrientation: function (event) {
                 // Obter os ângulos de inclinação do dispositivo
+                var alpha = event.alpha; // Orientação do dispositivo
                 var beta = event.beta; // Inclinação para frente/trás
                 var gamma = event.gamma; // Inclinação para esquerda/direita
 
@@ -81,10 +81,9 @@
                 var car = document.getElementById('model');
                 car.object3D.rotation.y = -gamma * Math.PI / 180; // Rotação em relação ao eixo y
                 car.object3D.rotation.x = beta * Math.PI / 180; // Rotação em relação ao eixo x
-
-                alert(`${gamma} -- ${beta}`);
             }
         });
+
     </script>
 </body>
 </html>

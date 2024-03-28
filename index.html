@@ -14,13 +14,13 @@
     vr-mode-ui="enabled: false"
     gesture-detector
     id="scene">
+    <!-- animation__spin="property: rotation; to: 0 360 0; loop: true; dur: 10000" -->
         <a-marker preset="hiro">
             <!-- Carregue o modelo Blender usando o atributo gltf-model -->
             <a-entity gltf-model="url(FPFmdel.glb)" 
             scale="0.5 0.5 0.5"
             rotation="0 0 0"
-            animation__spin="property: rotation; to: 0 360 0; loop: true; dur: 10000"
-            look-controls>
+            sensor-orientation>
       <!-- Adicione um objeto de colisão para capturar cliques -->
       <a-box position="0 0 0" depth="0.2" height="0.2" width="0.2" material="opacity: 0;"></a-box>
         </a-marker>
@@ -62,6 +62,24 @@
 
         document.addEventListener('touchend', function(event) {
             isTouching = false;
+        });
+    </script>
+
+    <script>
+        AFRAME.registerComponent('sensor-orientation', {
+            init: function () {
+                window.addEventListener('deviceorientation', this.rotateModel.bind(this), false);
+            },
+            rotateModel: function (event) {
+                // Obter os ângulos de inclinação do dispositivo
+                var beta = event.beta; // Inclinação para frente/trás
+                var gamma = event.gamma; // Inclinação para esquerda/direita
+
+                // Rotação automática do modelo com base nos ângulos de inclinação
+                var car = document.getElementById('car');
+                car.object3D.rotation.y = -gamma * Math.PI / 180; // Rotação em relação ao eixo y
+                car.object3D.rotation.x = beta * Math.PI / 180; // Rotação em relação ao eixo x
+            }
         });
     </script>
 </body>

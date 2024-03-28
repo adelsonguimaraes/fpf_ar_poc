@@ -6,6 +6,7 @@
     <title>Realidade Aumentada com Modelo Blender</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.0.8/aframe/build/aframe-ar.js"></script>
+    <script src="https://hammerjs.github.io/dist/hammer.min.js"></script> <!-- Importe a biblioteca Hammer.js -->
 </head>
 <body>
     <!-- renderer="logarithmicDepthBuffer: true;" -->
@@ -20,8 +21,7 @@
             <a-entity id="model" 
             gltf-model="url(FPFmdel.glb)" 
             scale="0.5 0.5 0.5"
-            rotation="0 0 0"
-            sliding-control>
+            rotation="0 0 0">
       <!-- Adicione um objeto de colisão para capturar cliques -->
       <!-- <a-box position="0 0 0" depth="0.2" height="0.2" width="0.2" material="opacity: 0;"></a-box> -->
         </a-marker>
@@ -67,33 +67,31 @@
 
 
         // Evento que pega gesto de rotação
-        AFRAME.registerComponent('sliding-control', {
-            init: function () {
-                this.touchStartX = 0;
-                this.el.addEventListener('touchstart', this.onTouchStart.bind(this));
-                this.el.addEventListener('touchmove', this.onTouchMove.bind(this));
+        // Inicialize o Hammer.js com o elemento da cena
+        var scene = document.querySelector('a-scene');
+        var hammertime = new Hammer(scene);
 
-                alert('AFRAME rodando')
-            },
-            onTouchStart: function (event) {
-                this.touchStartX = event.touches[0].clientX;
-            },
-            onTouchMove: function (event) {
-                var touchX = event.touches[0].clientX;
-                var deltaX = touchX - this.touchStartX;
-
-                // Defina o fator de escala para controlar a sensibilidade do movimento
-                var scaleFactor = 0.01;
-
-                // Atualize a posição do modelo no eixo X com base no movimento do dedo
-                var car = document.getElementById('car');
-                var currentPosition = car.getAttribute('position');
-                currentPosition.x += deltaX * scaleFactor;
-                car.setAttribute('position', currentPosition);
-
-                this.touchStartX = touchX; // Atualize a posição inicial do toque
+        // Adicione um listener para o evento de deslizamento horizontal
+        hammertime.on('swipe', function (event) {
+            // Verifique a direção do deslizamento
+            if (event.direction == Hammer.DIRECTION_LEFT) {
+                // Mova o modelo para a esquerda
+                moveModel(-0.1, 0, 0);
+            } else if (event.direction == Hammer.DIRECTION_RIGHT) {
+                // Mova o modelo para a direita
+                moveModel(0.1, 0, 0);
             }
         });
+
+        // Função para mover o modelo
+        function moveModel(deltaX, deltaY, deltaZ) {
+            var car = document.getElementById('car');
+            var currentPosition = car.getAttribute('position');
+            currentPosition.x += deltaX;
+            currentPosition.y += deltaY;
+            currentPosition.z += deltaZ;
+            car.setAttribute('position', currentPosition);
+        }
 
     </script>
 </body>

@@ -39,7 +39,7 @@
             scene.add(light);
 
             // specify a model URL
-            const modelUrl = 'https://raw.githubusercontent.com/immersive-web/webxr-samples/main/media/gltf/space/space.gltf';
+            const modelUrl = 'FPFmdel.glb';
 
             // create a GLTF loader object. GLTF is a 3D model format usually called the "JPEG of 3D" because it is
             // fast and efficient to use, which is ideal for the web
@@ -56,9 +56,11 @@
                 // onLoad callback: what get's called once the full model has loaded
                 function (gltf) {
                     // gltf.scene contains the Three.js object group that represents the 3d object of the model
-                    gltf.scene.scale.set(0.5, 0.5, 0.5); // Definindo a escala para metade (ajuste conforme necessário)
                     scene.add(gltf.scene);
                     console.log("Model added to scene");
+
+                    // Definir escala para o modelo
+                    gltf.scene.scale.set(0.1, 0.1, 0.1); // Ajuste os valores conforme necessário
 
                     // you can optionally change the position of the model
                     // gltf.scene.position.z = -10; // negative Z moves the model in the opposite direction the camera is facing

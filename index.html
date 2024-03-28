@@ -21,7 +21,7 @@
             gltf-model="url(FPFmdel.glb)" 
             scale="0.5 0.5 0.5"
             rotation="0 0 0"
-            gyro-rotation>
+            sliding-control>
       <!-- Adicione um objeto de colisão para capturar cliques -->
       <!-- <a-box position="0 0 0" depth="0.2" height="0.2" width="0.2" material="opacity: 0;"></a-box> -->
         </a-marker>
@@ -29,6 +29,8 @@
     </a-scene>
 
     <script>
+        alert('Atualizado 1');
+
         var isTouching = false;
         var initialTouchDistance = 0;
 
@@ -67,20 +69,29 @@
 
 
         // Evento que pega gesto de rotação
-        AFRAME.registerComponent('gyro-rotation', {
+        AFRAME.registerComponent('sliding-control', {
             init: function () {
-                window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
+                this.touchStartX = 0;
+                this.el.addEventListener('touchstart', this.onTouchStart.bind(this));
+                this.el.addEventListener('touchmove', this.onTouchMove.bind(this));
             },
-            handleOrientation: function (event) {
-                // Obter os ângulos de inclinação do dispositivo
-                var alpha = event.alpha; // Orientação do dispositivo
-                var beta = event.beta; // Inclinação para frente/trás
-                var gamma = event.gamma; // Inclinação para esquerda/direita
+            onTouchStart: function (event) {
+                this.touchStartX = event.touches[0].clientX;
+            },
+            onTouchMove: function (event) {
+                var touchX = event.touches[0].clientX;
+                var deltaX = touchX - this.touchStartX;
 
-                // Rotação automática do modelo com base nos ângulos de inclinação
-                var car = document.getElementById('model');
-                car.object3D.rotation.y = -gamma * Math.PI / 180; // Rotação em relação ao eixo y
-                car.object3D.rotation.x = beta * Math.PI / 180; // Rotação em relação ao eixo x
+                // Defina o fator de escala para controlar a sensibilidade do movimento
+                var scaleFactor = 0.01;
+
+                // Atualize a posição do modelo no eixo X com base no movimento do dedo
+                var car = document.getElementById('car');
+                var currentPosition = car.getAttribute('position');
+                currentPosition.x += deltaX * scaleFactor;
+                car.setAttribute('position', currentPosition);
+
+                this.touchStartX = touchX; // Atualize a posição inicial do toque
             }
         });
 

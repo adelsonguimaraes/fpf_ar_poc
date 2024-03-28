@@ -26,5 +26,43 @@
         </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
+
+    <script>
+        var isTouching = false;
+        var initialTouchDistance = 0;
+
+        // Adicione eventos de toque
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length === 2) {
+                isTouching = true;
+                initialTouchDistance = Math.hypot(
+                    event.touches[0].clientX - event.touches[1].clientX,
+                    event.touches[0].clientY - event.touches[1].clientY
+                );
+            }
+        });
+
+        document.addEventListener('touchmove', function(event) {
+            if (isTouching && event.touches.length === 2) {
+                var currentTouchDistance = Math.hypot(
+                    event.touches[0].clientX - event.touches[1].clientX,
+                    event.touches[0].clientY - event.touches[1].clientY
+                );
+
+                var zoomAmount = currentTouchDistance - initialTouchDistance;
+
+                var camera = document.querySelector('a-entity[camera]');
+                var currentPosition = camera.getAttribute('position');
+                currentPosition.z -= zoomAmount / 100; // Ajuste a sensibilidade do zoom aqui
+                camera.setAttribute('position', currentPosition);
+
+                initialTouchDistance = currentTouchDistance;
+            }
+        });
+
+        document.addEventListener('touchend', function(event) {
+            isTouching = false;
+        });
+    </script>
 </body>
 </html>

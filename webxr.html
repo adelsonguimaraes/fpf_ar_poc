@@ -3,18 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebXR com Google WebXR</title>
+    <title>WebXR Immersive AR</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.133.1/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.133.1/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.133.1/build/three.min.js"></script>
-    <script src="https://unpkg.com/@google/model-viewer@1.0.1/dist/model-viewer.min.js"></script>
+    <script>
+        // Configuração da cena Three.js
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-    <model-viewer
-        src="FPFmdel.glb"
-        ar
-        auto-rotate
-        camera-controls
-        style="width: 100%; height: 100vh;"
-    ></model-viewer>
+        // Carregar modelo glb
+        const loader = new THREE.GLTFLoader();
+        loader.load(
+            // URL do modelo glb
+            'FPFmdel.glb',
+            // Função de callback chamada quando o modelo é carregado
+            function (gltf) {
+                const model = gltf.scene;
+                scene.add(model);
+
+                // Iniciar WebXR Immersive AR quando o modelo for carregado
+                navigator.xr.requestSession('immersive-ar').then((session) => {
+                    session.updateRenderState({ baseLayer: new XRWebGLLayer(session, renderer) });
+
+                    session.requestReferenceSpace('viewer').then((referenceSpace) => {
+                        session.requestAnimationFrame((time, frame) => {
+                            const pose = frame.getViewerPose(referenceSpace);
+                            if (pose) {
+                                const viewerMatrix = new THREE.Matrix4().fromArray(pose.transform.matrix);
+                                camera.matrixAutoUpdate = false;
+                                camera.matrix = viewerMatrix;
+
+                                renderer.render(scene, camera);
+                            }
+                        });
+                    });
+                });
+            },
+            // Função de progresso (opcional)
+            function (xhr) {
+                console.log((xhr.loaded / xhr.total * 100) + '% carregado');
+            },
+            // Função de callback para lidar com erros (opcional)
+            function (error) {
+                console.error('Erro ao carregar o modelo:', error);
+            }
+        );
+
+        // Configuração da câmera
+        camera.position.set(0, 0, 0);
+
+    </script>
 </body>
 </html>

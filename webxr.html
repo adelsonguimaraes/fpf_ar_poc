@@ -57,7 +57,6 @@
                 function (gltf) {
                     // gltf.scene contains the Three.js object group that represents the 3d object of the model
                     gltf.scene.scale.set(0.5, 0.5, 0.5); // Definindo a escala para metade (ajuste conforme necessário)
-                    gltf.scene.position.copy(position);
                     scene.add(gltf.scene);
                     console.log("Model added to scene");
 

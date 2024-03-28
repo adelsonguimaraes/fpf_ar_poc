@@ -29,8 +29,6 @@
     </a-scene>
 
     <script>
-        alert('Atualizado 1');
-
         var isTouching = false;
         var initialTouchDistance = 0;
 
@@ -74,6 +72,8 @@
                 this.touchStartX = 0;
                 this.el.addEventListener('touchstart', this.onTouchStart.bind(this));
                 this.el.addEventListener('touchmove', this.onTouchMove.bind(this));
+
+                alert('AFRAME rodando')
             },
             onTouchStart: function (event) {
                 this.touchStartX = event.touches[0].clientX;

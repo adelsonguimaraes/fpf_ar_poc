@@ -8,55 +8,62 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.133.1/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
+    <button id="startARButton">Iniciar AR</button>
+    
     <script>
-        // Configuração da cena Three.js
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+        document.getElementById('startARButton').addEventListener('click', function() {
+            startAR();
+        });
 
-        // Carregar modelo glb
-        const loader = new THREE.GLTFLoader();
-        loader.load(
-            // URL do modelo glb
-            'FPFmdel.glb',
-            // Função de callback chamada quando o modelo é carregado
-            function (gltf) {
-                const model = gltf.scene;
-                scene.add(model);
+        function startAR() {
+            // Configuração da cena Three.js
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
 
-                // Iniciar WebXR Immersive AR quando o modelo for carregado
-                navigator.xr.requestSession('immersive-ar').then((session) => {
-                    session.updateRenderState({ baseLayer: new XRWebGLLayer(session, renderer) });
+            // Carregar modelo glb
+            const loader = new THREE.GLTFLoader();
+            loader.load(
+                // URL do modelo glb
+                'FPFmdel.glb',
+                // Função de callback chamada quando o modelo é carregado
+                function (gltf) {
+                    const model = gltf.scene;
+                    scene.add(model);
 
-                    session.requestReferenceSpace('viewer').then((referenceSpace) => {
-                        session.requestAnimationFrame((time, frame) => {
-                            const pose = frame.getViewerPose(referenceSpace);
-                            if (pose) {
-                                const viewerMatrix = new THREE.Matrix4().fromArray(pose.transform.matrix);
-                                camera.matrixAutoUpdate = false;
-                                camera.matrix = viewerMatrix;
+                    // Iniciar WebXR Immersive AR quando o modelo for carregado
+                    navigator.xr.requestSession('immersive-ar').then((session) => {
+                        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, renderer) });
 
-                                renderer.render(scene, camera);
-                            }
+                        session.requestReferenceSpace('viewer').then((referenceSpace) => {
+                            session.requestAnimationFrame((time, frame) => {
+                                const pose = frame.getViewerPose(referenceSpace);
+                                if (pose) {
+                                    const viewerMatrix = new THREE.Matrix4().fromArray(pose.transform.matrix);
+                                    camera.matrixAutoUpdate = false;
+                                    camera.matrix = viewerMatrix;
+
+                                    renderer.render(scene, camera);
+                                }
+                            });
                         });
                     });
-                });
-            },
-            // Função de progresso (opcional)
-            function (xhr) {
-                console.log((xhr.loaded / xhr.total * 100) + '% carregado');
-            },
-            // Função de callback para lidar com erros (opcional)
-            function (error) {
-                console.error('Erro ao carregar o modelo:', error);
-            }
-        );
+                },
+                // Função de progresso (opcional)
+                function (xhr) {
+                    console.log((xhr.loaded / xhr.total * 100) + '% carregado');
+                },
+                // Função de callback para lidar com erros (opcional)
+                function (error) {
+                    console.error('Erro ao carregar o modelo:', error);
+                }
+            );
 
-        // Configuração da câmera
-        camera.position.set(0, 0, 0);
-
+            // Configuração da câmera
+            camera.position.set(0, 0, 0);
+        }
     </script>
 </body>
 </html>

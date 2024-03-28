@@ -16,14 +16,36 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Carregar modelo glTF
+        // Carregar modelo glb
         const loader = new THREE.GLTFLoader();
         loader.load(
-            // URL do modelo glTF
-            'FPFmdel.glb',
+            // URL do modelo glb
+            'FPFmodel.glb',
             // Função de callback chamada quando o modelo é carregado
             function (gltf) {
-                scene.add(gltf.scene);
+                const model = gltf.scene;
+                scene.add(model);
+
+                // Iniciar WebXR quando o modelo for carregado
+                navigator.xr.requestDevice().then((device) => {
+                    device.requestSession({ mode: 'immersive-ar' }).then((session) => {
+                        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, renderer) });
+                        session.requestAnimationFrame(renderFrame);
+
+                        // Função de renderização do quadro
+                        function renderFrame(time, frame) {
+                            const pose = frame.getViewerPose(frame.session.referenceSpace);
+                            if (pose) {
+                                const viewerMatrix = new THREE.Matrix4().fromArray(pose.transform.matrix);
+                                camera.matrixAutoUpdate = false;
+                                camera.matrix = viewerMatrix;
+
+                                renderer.render(scene, camera);
+                                session.requestAnimationFrame(renderFrame);
+                            }
+                        }
+                    });
+                });
             },
             // Função de progresso (opcional)
             function (xhr) {
@@ -36,19 +58,8 @@
         );
 
         // Configuração da câmera
-        camera.position.set(0, 1.6, 3);
+        camera.position.set(0, 0, 0);
 
-        // Função para atualizar a cena
-        function animate() {
-            renderer.setAnimationLoop(render);
-        }
-
-        function render() {
-            renderer.render(scene, camera);
-        }
-
-        // Iniciar a animação
-        animate();
     </script>
 </body>
 </html>

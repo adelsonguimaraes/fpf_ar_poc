@@ -9,6 +9,7 @@
 
     <!-- three.js -->
     <script src="https://unpkg.com/three@0.126.0/build/three.js"></script>
+    <script src="https://unpkg.com/three@0.126.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 
 <body>
@@ -33,6 +34,21 @@
             directionalLight.position.set(10, 15, 10);
             scene.add(directionalLight);
 
+            // Set up the WebGLRenderer, which handles rendering to the session's base layer.
+            const renderer = new THREE.WebGLRenderer({
+                alpha: true,
+                preserveDrawingBuffer: true,
+                canvas: canvas,
+                context: gl
+            });
+            renderer.autoClear = false;
+
+            // The API directly updates the camera matrices.
+            // Disable matrix auto updates so three.js doesn't attempt
+            // to handle the matrices independently.
+            const camera = new THREE.PerspectiveCamera();
+            camera.matrixAutoUpdate = false;
+
             // Initialize a WebXR session using "immersive-ar".
             const session = await navigator.xr.requestSession("immersive-ar", { requiredFeatures: ['hit-test'] });
             session.updateRenderState({
@@ -43,50 +59,51 @@
             // near the viewer's position at the time the session was created.
             const referenceSpace = await session.requestReferenceSpace('local');
 
+            const loader = new THREE.GLTFLoader();
+            let reticle;
+            loader.load("https://immersive-web.github.io/webxr-samples/media/gltf/reticle/reticle.gltf", function (gltf) {
+                reticle = gltf.scene;
+                reticle.visible = false;
+                scene.add(reticle);
+            })
+
+            let flower;
+            loader.load("https://immersive-web.github.io/webxr-samples/media/gltf/sunflower/sunflower.gltf", function (gltf) {
+                flower = gltf.scene;
+            });
+
             // Create a render loop that allows us to draw on the AR view.
             const onXRFrame = (time, frame) => {
-                // Queue up the next draw request.
-                session.requestAnimationFrame(onXRFrame);
 
-                // Bind the graphics framebuffer to the baseLayer's framebuffer
-                gl.bindFramebuffer(gl.FRAMEBUFFER, session.renderState.baseLayer.framebuffer)
+                // Create a render loop that allows us to draw on the AR view.
+                const onXRFrame = (time, frame) => {
+                    // Queue up the next draw request.
+                    session.requestAnimationFrame(onXRFrame);
 
-                // Retrieve the pose of the device.
-                // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
-                const pose = frame.getViewerPose(referenceSpace);
-                if (pose) {
-                    // In mobile AR, we only have one view.
-                    const view = pose.views[0];
+                    // Bind the graphics framebuffer to the baseLayer's framebuffer
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, session.renderState.baseLayer.framebuffer)
 
-                    const viewport = session.renderState.baseLayer.getViewport(view);
-                    renderer.setSize(viewport.width, viewport.height)
+                    // Retrieve the pose of the device.
+                    // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
+                    const pose = frame.getViewerPose(referenceSpace);
+                    if (pose) {
+                        // In mobile AR, we only have one view.
+                        const view = pose.views[0];
 
-                    // Use the view's transform matrix and projection matrix to configure the THREE.camera.
-                    camera.matrix.fromArray(view.transform.matrix)
-                    camera.projectionMatrix.fromArray(view.projectionMatrix);
-                    camera.updateMatrixWorld(true);
+                        const viewport = session.renderState.baseLayer.getViewport(view);
+                        renderer.setSize(viewport.width, viewport.height)
 
-                    // Render the scene with THREE.WebGLRenderer.
-                    renderer.render(scene, camera)
+                        // Use the view's transform matrix and projection matrix to configure the THREE.camera.
+                        camera.matrix.fromArray(view.transform.matrix)
+                        camera.projectionMatrix.fromArray(view.projectionMatrix);
+                        camera.updateMatrixWorld(true);
+
+                        // Render the scene with THREE.WebGLRenderer.
+                        renderer.render(scene, camera)
+                    }
                 }
+                session.requestAnimationFrame(onXRFrame);
             }
-            session.requestAnimationFrame(onXRFrame);
-        }
-
-        // Set up the WebGLRenderer, which handles rendering to the session's base layer.
-        const renderer = new THREE.WebGLRenderer({
-            alpha: true,
-            preserveDrawingBuffer: true,
-            canvas: canvas,
-            context: gl
-        });
-        renderer.autoClear = false;
-
-        // The API directly updates the camera matrices.
-        // Disable matrix auto updates so three.js doesn't attempt
-        // to handle the matrices independently.
-        const camera = new THREE.PerspectiveCamera();
-        camera.matrixAutoUpdate = false;
 
 
     </script>

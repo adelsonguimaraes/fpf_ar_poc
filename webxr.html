@@ -11,17 +11,40 @@
 </head>
 
 <body>
+    <div id="select">
+        select model
+        <select name="model" id="model">
+            <option value="">Select Model</option>
+            <option value="FPFmdel.glb">FPF</option>
+            <option value="baker_and_the_bridge.glb">Bark</option>
+            <option value="log_cabin.glb">Log Cabin</option>
+        </select>
+    </div>
+
     <script type="module">
+        const divSelect = document.querySelector('div#select');
+        const select = divSelect.querySelector('select');
+        select.addEventListener('change', (e) => {
+            const modelUrl = e.target.value;
+            
+            if (modelUrl === '') return false;
+
+            init(modelUrl);
+            animate();
+        });
+
         import { ARButton } from 'https://unpkg.com/three@0.126.0/examples/jsm/webxr/ARButton.js';
 
         let camera, scene, renderer;
         let loader; // we need to create a variable for a gltf model loader
 
-        init();
-        animate();
 
-        function init() {
+        function init(modelUrl) {
+            const search = document.querySelector('div#container')
+            if (search) search.remove();
+
             const container = document.createElement('div');
+            container.id = 'container';
             document.body.appendChild(container);
 
             scene = new THREE.Scene();
@@ -39,7 +62,7 @@
             scene.add(light);
 
             // specify a model URL
-            const modelUrl = 'FPFmdel.glb';
+            // const modelUrl = 'FPFmdel.glb';
 
             // create a GLTF loader object. GLTF is a 3D model format usually called the "JPEG of 3D" because it is
             // fast and efficient to use, which is ideal for the web
